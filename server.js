@@ -25,6 +25,8 @@ http.createServer(function (req, res) {
         res.end('404: File Not Found');
     }
 }).listen(8080);
+console.log('server is running on http://localhost:8080/');
+
 
 async function processPayload(body) {
     const token = await auth();

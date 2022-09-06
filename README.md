@@ -36,6 +36,14 @@ How to use:
 - Test linked banner on your website, fill the form, copy the code and test cart and checkout (the code will be invalidated in SheerID system immediately after successful verification)
 - Don't forget to switch the program to Live mode on https://my.sheerid.com/ 
 
+## Server for SheerID webhook
+
+As an example for running a server providing a webhook endpoint for [SheerID Settings](https://my.sheerid.com/settings) Webhook (coming), see `server.js`.
+
+To avoid the need of changing `.env` file `server.js` has several hardcoded entries that should be part of configuration,
+like port.
+The created cart rules are not "empty", but they need setting up in Merchant Center after the webhook.
+
 ## This repository
 
 This is spike code. Feel free to copy-paste from it, if you like playing with razors blindfolded.

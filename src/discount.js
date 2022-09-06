@@ -19,4 +19,22 @@ const getCartDiscount = async (code, token) => {
     });
 }
 
-module.exports = getCartDiscount;
+const getCartDiscounts = async (token) => {
+    return new Promise(function (resolve, reject) {
+        request({
+            'method': 'GET',
+            'url': `${config.CTP_API_URL}/${config.CTP_PROJECT_KEY}/cart-discounts`,
+            'headers': {
+                'Authorization': 'Bearer '+token,
+            },
+        }, function (error, res, body) {
+            if (!error && res.statusCode == 200) {
+                resolve(JSON.parse(body));
+            } else {
+                reject(error);
+            }
+        });
+    });
+}
+
+module.exports = { getCartDiscount, getCartDiscounts };

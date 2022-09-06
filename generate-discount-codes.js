@@ -3,7 +3,7 @@ var config = require('dotenv').config().parsed;
 
 const auth = require('./src/auth');
 const nano = require('./src/nano');
-const getCartDiscount = require('./src/discount');
+const { getCartDiscount } = require('./src/discount');
 
 function makeid(length) {
     var result = '';

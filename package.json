@@ -3,8 +3,12 @@
   "version": "0.1.0",
   "main": "index.js",
   "license": "MIT",
+  "type": "module",
   "dependencies": {
     "dotenv": "^16.0.2",
-    "request": "^2.88.2"
+    "node-fetch": "^3.2.10"
+  },
+  "imports": {
+    "@/*": "./src/*"
   }
 }

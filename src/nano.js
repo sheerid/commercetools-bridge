@@ -3,4 +3,4 @@ function nano() {
   return (hrTime[0] * 1000000000 + hrTime[1]).toString(36)
 }
 
-module.exports = nano;
+export { nano };

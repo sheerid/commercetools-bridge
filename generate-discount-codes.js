@@ -1,9 +1,9 @@
-var request = require('request');
-var config = require('dotenv').config().parsed;
+import config from './src/config.js';
+import fetch from 'node-fetch';
 
-const auth = require('./src/auth');
-const nano = require('./src/nano');
-const { getCartDiscount } = require('./src/discount');
+import { auth } from './src/auth';
+import { nano } from './src/nano';
+import { getCartDiscount } from './src/discount.js';
 
 function makeid(length) {
     var result = '';
@@ -16,7 +16,7 @@ function makeid(length) {
     return (result.substring(0, length / 2) + nano() + result.substring(length / 2, length)).toUpperCase();
 }
 
-async function main() {
+const main = async () => {
     if (process.argv.length < 5) {
         console.log('Usage: node generate-discount-codes.js <prefix> <cart discount id (UUID)> <number of codes>');
         return;
@@ -31,14 +31,14 @@ async function main() {
     const cartDiscountId = process.argv[3];
     const numberOfCodes = process.argv[4];
 
-    const discount = await getCartDiscount(cartDiscountId, token.access_token);
-    const name = discount.name.en;
+    const discount = await getCartDiscount(token.access_token, cartDiscountId);
     console.log('Discount Codes');
 
     for (let i = 0; i < numberOfCodes; i++) {
-        request({
+        fetch(
+            `${config.CTP_API_URL}/${config.CTP_PROJECT_KEY}/discount-codes`,
+            {
             'method': 'POST',
-            'url': `${config.CTP_API_URL}/${config.CTP_PROJECT_KEY}/discount-codes`,
             'headers': {
                 'Authorization': 'Bearer ' + token.access_token,
                 'Content-Type': 'application/json'
@@ -55,10 +55,6 @@ async function main() {
                 "isActive": true,
                 "cartPredicate": "1=1"
             })
-        }, function (error, response) {
-            if (error) throw new Error(error);
-            const res = JSON.parse(response.body);
-            console.log(res.code);
         });
     }
 }

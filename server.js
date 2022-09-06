@@ -1,15 +1,26 @@
-var http = require('http');
-var request = require('request');
-var config = require('dotenv').config().parsed;
+import { config } from 'dotenv';
+import http from 'http';
+import { auth } from './src/auth.js';
 
-const auth = require('./src/auth');
-const { getCartDiscounts } = require('./src/discount');
+import { getCartDiscounts, createCartDiscount, createDiscountCode } from './src/discount.js';
 
-http.createServer(function (req, res) {
+const token = await auth();
+
+http.createServer(async (req, res) => {
     if (req.url === '/' && req.method === 'GET') {
         res.writeHead(200, {'Content-Type': 'text/plain'});
         res.end('SheerID - commercetools Demo server');
-    } else if (req.url === '/webhook' && req.method === 'GET') {
+    } else if (req.url === '/cart-discounts' && req.method === 'GET') {
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        const discounts = await getCartDiscounts(token.access_token);
+        console.log('number of discounts:', discounts.total);
+        const o = {};
+        discounts.results.forEach(element => {
+            console.log(element);
+            o[element.id] = element.name.en;
+        });
+        res.end(JSON.stringify(o));
+    } else if (req.url === '/success-webhook' && req.method === 'POST') {
         let body = [];
         req.on('data', (chunk) => {
             body.push(chunk);
@@ -17,62 +28,27 @@ http.createServer(function (req, res) {
             body = Buffer.concat(body).toString();
             res.end('OK');
             if (body != undefined && body.length > 0) {
-                processPayload(body);
+                const discount = JSON.parse(body);
+                const prefix = config.PREFIX;
+                createDiscountCode(prefix, name, cartDiscountId);
+            }
+        });
+    } else if (req.url === '/webhook' && req.method === 'POST') {
+        let body = [];
+        req.on('data', (chunk) => {
+            body.push(chunk);
+        }).on('end', () => {        
+            body = Buffer.concat(body).toString();
+            res.end('OK');
+            if (body != undefined && body.length > 0) {
+                const r = JSON.parse(body);
+                console.log('processing name', r.name);
+                createCartDiscount(token, r);
             }
         });
     } else {
         res.statusCode = 404;
         res.end('404: File Not Found');
     }
-}).listen(8080);
-console.log('server is running on http://localhost:8080/');
-
-
-async function processPayload(body) {
-    const token = await auth();
-    if (token.error) {
-        console.log(`Can't process ${body} due to commercetools auth error ${token.error}`);
-        return;
-    }    
-
-    const r = JSON.parse(body);
-    console.log('processing name', r.name);
-    
-    const discounts = await getCartDiscounts(token.access_token);
-    console.log('number of discounts:', discounts.total);
-    // To do: loop through discounts and calculate the new sort order instead of random
-
-    request({
-        'method': 'POST',
-        'url': `${config.CTP_API_URL}/${config.CTP_PROJECT_KEY}/cart-discounts`,
-        'headers': {
-            'Authorization': 'Bearer ' + token.access_token,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            "name" : {
-                "en" : r.name,
-            },
-            "value" : {
-                "type" : "relative",
-                "permyriad" : 1000
-            },
-            "cartPredicate" : "1=1",
-            "target" : {
-                "type" : "lineItems",
-                "predicate" : "1=1"
-            },
-            "sortOrder" : Math.random().toString(),
-            "isActive" : true,
-            "requiresDiscountCode" : false
-        })
-    }, function (error, response) {
-        if (error) throw new Error(error);
-        const res = JSON.parse(response.body);
-        if (res.id != undefined) {
-            console.log('created:', res.id);
-        } else {
-            console.error('error:', res)
-        }
-    });
-}
+}).listen(80);
+console.log('server is running on http://localhost/');

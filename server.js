@@ -29,8 +29,7 @@ http.createServer(async (req, res) => {
             res.end('OK');
             if (body != undefined && body.length > 0) {
                 const discount = JSON.parse(body);
-                const prefix = config.PREFIX;
-                createDiscountCode(prefix, name, cartDiscountId);
+                createDiscountCode("SHEERID-", discount.name, cartDiscountId);
             }
         });
     } else if (req.url === '/webhook' && req.method === 'POST') {

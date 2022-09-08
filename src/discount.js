@@ -76,4 +76,4 @@ const createDiscountCode = (prefix, name, cartDiscountId) => {
     })
 } 
 
-export { getCartDiscount, getCartDiscounts, createCartDiscount };
+export { getCartDiscount, getCartDiscounts, createCartDiscount, createDiscountCode };

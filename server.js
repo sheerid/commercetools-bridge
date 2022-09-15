@@ -18,7 +18,7 @@ const verificationStatus = async (verificationId) => {
 const onSuccess = async (cartId, verificationData) => {
     // create new discount code
     // add directDiscount to cart
-    return await redis.set(`cart-${cartId}`, JSON.stringify(verificationData))
+    return await redis.set(`cart-${cartId}`, JSON.stringify(verificationData));
 }
 
 import { getCartDiscounts, createCartDiscount, createDiscountCode } from './src/discount.js';
@@ -54,6 +54,12 @@ http.createServer(async (req, res) => {
         }
         res.writeHead(200, {'Content-Type': 'application/json'});
         res.end(cartJson);
+    } else if (req.url.startsWith('/api/update') && req.method === 'GET') {
+        const q = url.parse(req.url, true).query;
+        console.log('get /api/update', q.cid);
+        redis.set(`cartid-${q.cid}`, q.cart);
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.end(`{}`);
     } else if (req.url === '/api/success-webhook' && req.method === 'POST') {
         console.log('post /api/success-webhook');
         let body = [];

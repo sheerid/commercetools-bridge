@@ -22,27 +22,23 @@ How to use:
     - Scope can be "Admin client" (not recommended) or "Manage" Cart discounts and Discount codes
     - Download the created API client's "Environment variables (.env)" file before closing the popup
     - Add the .env file to the project root
-- Run `node get-cart-discounts.js`, copy the desired ID (UUID format, like `f9c4718e-0792-4f08-a802-70f81ef9d46d`)
-- Run `node generate-discount-codes.js STUD20- f9c4718e-0792-4f08-a802-70f81ef9d46d 20 > newcodes.csv`
-- Check `newcodes.csv` for the generated discount codes
-- Sanity check the generated discount codes in Merchant Center > Discounts > Discount code list
-- Test code behaviours in the cart without using them, or by removing the used up codes from the csv
-- On https://my.sheerid.com/ 
-    - Create a SheerID program, e.g. "Student discount"
-    - Upload `newcodes.csv` to the Codes step "Single-Use Codes" card
-    - Copy the Web URL from Publish step "New Page"
-
-- Add the copied Web URL to your website as a banner link or button
-- Test linked banner on your website, fill the form, copy the code and test cart and checkout (the code will be invalidated in SheerID system immediately after successful verification)
-- Don't forget to switch the program to Live mode on https://my.sheerid.com/ 
-
-## Server for SheerID webhook
-
-As an example for running a server providing a webhook endpoint for [SheerID Settings](https://my.sheerid.com/settings) Webhook (coming), see `server.js`.
-
-To avoid the need of changing `.env` file `server.js` has several hardcoded entries that should be part of configuration,
-like port.
-The created cart rules are not "empty", but they need setting up in Merchant Center after the webhook.
+- Log in to your SheerID Dashboard and
+    - Create a SheerID program, that you will use e.g. "Student discount"
+    - Configure your program with eligibility, theme etc
+    - Set Codes section to "No Code"
+    - In Program Settings 
+        - set Webhook for eligible verification to `https://<your_server_address>/api/success-webhook`
+        - add cartid as Campaign Metadata field
+    - Copy access token from Settings > Access Tokens page
+- Edit the downloaded .env file, add 
+```
+SHEERID_TOKEN=<your copied SheerID Access Token>
+SHEERID_API_URL=https://services.sheerid.com/rest/v2/
+URL=https://sheeriddemo.gpmd.net/
+PORT=8080
+```
+- Run `node server.js` or `yarn server` to run the bridge application.
+- Check that it's running by visiting the server URL indicated by the application.
 
 ## This repository
 

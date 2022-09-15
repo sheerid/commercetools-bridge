@@ -1,21 +1,33 @@
 import fetch from 'node-fetch';
 import { config } from './config.js';
 
-const createWebhook = async (programID) => {
+const createWebhook = async (programId) => {
     const res = await fetch(
-    `${config.SHEERID_API_URL}/rest/v2/program/${programID}/webhook`, {
-    'method': 'post',
-    'headers': {
-        'Authorization': `Basic ${config.SHEERID_TOKEN}`,
-        'Content-Type': 'application/json'
-    },
-    data: {
-        'scope': config.URL + '/success-webhook'
-    }
+        `${config.SHEERID_API_URL}/program/${programId}/webhook`, {
+        'method': 'POST',
+        'headers': {
+            'Authorization': `Bearer ${config.SHEERID_TOKEN}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'callbackUri': `${config.URL}/api/success-webhook`,
+        })
     });
-    return await res.json();
+    return res.json();
 }
 
-export { createWebhook };
+const getVerification = async (verificationId) => {
+    const res = await fetch(
+        `${config.SHEERID_API_URL}/verification/${verificationId}/details`, {
+        'method': 'GET',
+        'headers': {
+            'Authorization': `Bearer ${config.SHEERID_TOKEN}`,
+            'Content-Type': 'application/json'
+        },
+    });
+    return res.json();
+}
+
+export { createWebhook, getVerification };
 
 

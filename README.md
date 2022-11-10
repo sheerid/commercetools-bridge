@@ -1,8 +1,10 @@
-# Commercetools SheerID discount codes
+# Commercetools SheerID bridge example application
 
+This is not a production ready application. It is just an example of how to use the commercetools SheerID bridge, keeping the code as simple as possible.
 This is a quick overview of how to integrate [SheerID verification](https://www.sheerid.com/) to your commercetools (https://www.commercetools.com/) site without automatic processes.
 
 ## Requirements
+
 - a commercetools website, access to Merchant Center with a user that has access to the Settings > Developer settings > API keys
 - a SheerID account
 - computer with nodejs v16 or not much higher (should work from v10 and with recent versions but no guarantees)
@@ -30,16 +32,15 @@ How to use:
         - set Webhook for eligible verification to `https://<your_server_address>/api/success-webhook`
         - add cartid as Campaign Metadata field
     - Copy access token from Settings > Access Tokens page
-- Edit the downloaded .env file, add 
+- Edit the downloaded .env file and based on the provided `.env.example` file, add relevant information about your setup, for example:
 ```
 SHEERID_TOKEN=<your copied SheerID Access Token>
 SHEERID_API_URL=https://services.sheerid.com/rest/v2/
-URL=https://sheeriddemo.gpmd.net/
+URL=https://www.yourwebsite.com/
 PORT=8080
+REDIS_HOST=localhost
+REDIS_PORT=6379
 ```
+- If you are changing the port, make sure to update the webhook URL in SheerID Dashboard and if you are using Docker or Kubernetes, make sure to update the port in Dockerfile and your deployment files
 - Run `node server.js` or `yarn server` to run the bridge application.
 - Check that it's running by visiting the server URL indicated by the application.
-
-## This repository
-
-This is spike code. Feel free to copy-paste from it, if you like playing with razors blindfolded.

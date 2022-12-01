@@ -62,6 +62,13 @@ http.createServer(async (req, res) => {
         console.log('get /');
         res.writeHead(200, {'Content-Type': 'text/plain'});
         res.end('SheerID - commercetools Demo server');
+    } else if (req.url === '/api/demodata') {
+        const demoData = {
+            "HARVARDCRIMPROXS": "Harvard Business School (Boston, MA)",
+            "CALTECHHOODIEXS": "California Institute of Technology (Pasadena, CA)",
+        }
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.end(JSON.stringify(demoData));
     } else if (req.url.startsWith('/api/create-webhook')) {
         const q = url.parse(req.url, true).query;
         const r = await createWebhook(q.pid);
@@ -158,7 +165,8 @@ http.createServer(async (req, res) => {
                 verificationStatus(res.verificationId).then((r) => {
                     try {
                         if (r.personInfo?.metadata != undefined) {
-                            const cartId = r.personInfo.metadata.cartid;
+                            console.log('metadata', r.personInfo.metadata);
+                            const cartId = r.personInfo.metadata.cid;
                             console.log(`saving ${cartId} cart id`);
                             onSuccess(cartId, r);
                         } else {

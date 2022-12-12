@@ -20,6 +20,4 @@ if (config == undefined) {
     };
 }
 
-console.log('config', config, process.env.PORT);
-
 export { config };

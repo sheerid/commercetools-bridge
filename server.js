@@ -107,53 +107,8 @@ http.createServer(async (req, res) => {
         } catch (e) {
             console.log(e);
         }
-        // return;
-        // const storedCart = await redis.get(`cart-${q.cid}`);
-        // if (!storedCart) {
-        //     return;
-        // }
-        // const rb = await fetch("https://api.europe-west1.gcp.commercetools.com/sunrise-spa/graphql", {
-        //     "headers": {
-        //         "authorization": "Bearer "+q.t,
-        //         "content-type": "application/json",
-        //     },
-        //     "method": "POST",
-        //     "body": "{\"operationName\":\"myCart\",\"variables\":{\"locale\":\"en\"},\"query\":\"query myCart($locale: Locale!) {\\n  myCart: me {\\n    activeCart {\\n      cartId: id\\n      version\\n      lineItems {\\n        lineId: id\\n        name(locale: $locale)\\n        productSlug(locale: $locale)\\n        quantity\\n        price {\\n          value {\\n            centAmount\\n            currencyCode\\n            fractionDigits\\n            __typename\\n          }\\n          discounted {\\n            value {\\n              centAmount\\n              currencyCode\\n              fractionDigits\\n              __typename\\n            }\\n            discount {\\n              name(locale: $locale)\\n              __typename\\n            }\\n            __typename\\n          }\\n          __typename\\n        }\\n        totalPrice {\\n          centAmount\\n          currencyCode\\n          fractionDigits\\n          __typename\\n        }\\n        variant {\\n          sku\\n          images {\\n            url\\n            __typename\\n          }\\n          attributesRaw {\\n            name\\n            value\\n            attributeDefinition {\\n              type {\\n                name\\n                __typename\\n              }\\n              name\\n              label(locale: $locale)\\n              __typename\\n            }\\n            __typename\\n          }\\n          __typename\\n        }\\n        __typename\\n      }\\n      totalPrice {\\n        centAmount\\n        currencyCode\\n        fractionDigits\\n        __typename\\n      }\\n      shippingInfo {\\n        shippingMethod {\\n          methodId: id\\n          name\\n          localizedDescription(locale: $locale)\\n          __typename\\n        }\\n        price {\\n          centAmount\\n          currencyCode\\n          fractionDigits\\n          __typename\\n        }\\n        __typename\\n      }\\n      taxedPrice {\\n        totalGross {\\n          centAmount\\n          currencyCode\\n          fractionDigits\\n          __typename\\n        }\\n        totalNet {\\n          centAmount\\n          currencyCode\\n          fractionDigits\\n          __typename\\n        }\\n        __typename\\n      }\\n      discountCodes {\\n        discountCode {\\n          codeId: id\\n          code\\n          name(locale: $locale)\\n          __typename\\n        }\\n        __typename\\n      }\\n      shippingAddress {\\n        firstName\\n        lastName\\n        streetName\\n        additionalStreetInfo\\n        postalCode\\n        city\\n        country\\n        phone\\n        email\\n        __typename\\n      }\\n      billingAddress {\\n        firstName\\n        lastName\\n        streetName\\n        additionalStreetInfo\\n        postalCode\\n        city\\n        country\\n        phone\\n        email\\n        __typename\\n      }\\n      __typename\\n    }\\n    __typename\\n  }\\n}\"}",
-        // });
-        // const r = await rb.json();
-        // const activeCart = await r.data.myCart.activeCart;
-        // console.log('cart version:', JSON.stringify(activeCart.version));
-
-        // const code = "ST"+makeid(6)
-        // console.log('updating cart', activeCart.cartId, code);
-        // const dc = await createDiscountCode(token, "Student Discount", config.CART_DISCOUNT_ID, code);
-        // console.log('discountcode:', dc);
-        // if (dc) {
-        //     const qi = JSON.stringify({
-        //         "operationName":"mutateCart",
-        //         "variables":{
-        //             "actions":[{"addDiscountCode":{"code": dc.code }}],
-        //             "version":activeCart.version,
-        //             "id":activeCart.cartId,
-        //             },
-        //         "query":"mutation mutateCart($actions: [MyCartUpdateAction!]!, $version: Long!, $id: String!) {\n updateMyCart(actions: $actions, version: $version, id: $id) {\n id\n version\n lineItems {\nlineId: id\nquantity\n__typename\n}\n__typename\n}\n}",
-        //     })
-        //     console.log('q', qi);
-        //     fetch("https://api.europe-west1.gcp.commercetools.com/sunrise-spa/graphql", {
-        //         "headers": {
-        //             "authorization": "Bearer "+q.t,
-        //             "content-type": "application/json",
-        //         },
-        //         "method": "POST",
-        //         "body": qi,
-        //     }).then(async(res)=>{
-        //         const r = await res.json();
-        //         console.log(r)
-        //     });
-        // }
-
     } else if (req.url === '/api/success-webhook' && req.method === 'POST') {
-        console.log('post /api/success-webhook');
+        console.log(`post /api/success-webhook => ${config.SHEERID_API_URL}`);
         let body = [];
         req.on('data', (chunk) => {
             body.push(chunk);
@@ -162,6 +117,7 @@ http.createServer(async (req, res) => {
             res.end('OK');
             if (body != undefined && body.length > 0) {
                 const res = JSON.parse(body);
+                console.log(`processing verification ${config.SHEERID_API_URL}`, body);
                 verificationStatus(res.verificationId).then((r) => {
                     try {
                         if (r.personInfo?.metadata != undefined) {
@@ -193,7 +149,7 @@ http.createServer(async (req, res) => {
             }
         });
     } else {
-        console.log(`Error from ${config.SHEERID_API_URL}/verification/.../details`);
+        console.log('404', req.url);
         res.statusCode = 404;
         res.end('404: File Not Found');
     }

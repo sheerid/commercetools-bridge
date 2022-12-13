@@ -70,10 +70,12 @@ http.createServer(async (req, res) => {
         res.writeHead(200, {'Content-Type': 'application/json'});
         res.end(JSON.stringify(demoData));
     } else if (req.url.startsWith('/api/create-webhook')) {
+        return; // disabled, reference only
         const q = url.parse(req.url, true).query;
         const r = await createWebhook(q.pid);
         res.end(JSON.stringify(r));
     } else if (req.url === '/api/cart-discounts' && req.method === 'GET') {
+        return; // disabled, reference only
         console.log('get /api/cart-discounts');
         res.writeHead(200, {'Content-Type': 'application/json'});
         const discounts = await getCartDiscounts(token.access_token);
@@ -94,6 +96,7 @@ http.createServer(async (req, res) => {
         res.writeHead(200, {'Content-Type': 'application/json'});
         res.end(cartJson);
     } else if (req.url.startsWith('/api/getcarts') && req.method === 'GET') {
+        return; // disabled, reference only
         const q = url.parse(req.url, true).query;
         res.writeHead(200, {'Content-Type': 'application/json'});
         res.end(JSON.stringify(await getCarts(token)));
@@ -135,7 +138,7 @@ http.createServer(async (req, res) => {
             }
         });
     } else if (req.url === '/api/webhook' && req.method === 'POST') {
-        console.log('post /api/cart-discounts');
+        return; // disabled, reference only
         let body = [];
         req.on('data', (chunk) => {
             body.push(chunk);

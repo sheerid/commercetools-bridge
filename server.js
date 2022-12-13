@@ -193,7 +193,7 @@ http.createServer(async (req, res) => {
             }
         });
     } else {
-        console.log('404', req);
+        console.log(`Error from ${config.SHEERID_API_URL}/verification/.../details`);
         res.statusCode = 404;
         res.end('404: File Not Found');
     }

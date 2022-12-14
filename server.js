@@ -137,6 +137,8 @@ http.createServer(async (req, res) => {
                 });
             }
         });
+    } else if (req.url === '/health') {
+        res.end('OK');
     } else if (req.url === '/api/webhook' && req.method === 'POST') {
         return; // disabled, reference only
         let body = [];

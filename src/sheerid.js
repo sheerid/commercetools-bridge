@@ -7,7 +7,8 @@ const createWebhook = async (programId) => {
         'method': 'POST',
         'headers': {
             'Authorization': `Bearer ${config.SHEERID_TOKEN}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'User-Agent': 'SheerID commercetools app '+config.VERSION,
         },
         body: JSON.stringify({
             'callbackUri': `${config.URL}/api/success-webhook`,
@@ -22,7 +23,8 @@ const getVerification = async (verificationId) => {
         'method': 'GET',
         'headers': {
             'Authorization': `Bearer ${config.SHEERID_TOKEN}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'User-Agent': 'SheerID commercetools app '+config.VERSION,
         },
     });
     return res.json();

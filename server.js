@@ -138,4 +138,4 @@ http.createServer(async (req, res) => {
         res.end('404: File Not Found');
     }
 }).listen(config.PORT);
-console.log(`server is running on http://localhost:${config.PORT}/`);
+console.log(`server is running on http://localhost:${config.PORT}/`, JSON.stringify(config));

@@ -17,7 +17,7 @@ const createWebhook = async (programId) => {
     return res.json();
 }
 
-const getVerification = async (verificationId) => {
+const getVerificationPromise = async (verificationId) => {
     const res = await fetch(
         `${config.SHEERID_API_URL}/verification/${verificationId}/details`, {
         'method': 'GET',
@@ -28,6 +28,10 @@ const getVerification = async (verificationId) => {
         },
     });
     return res.json();
+}
+
+const getVerification = async (verificationId) => {
+    return await getVerificationPromise(verificationId);
 }
 
 export { createWebhook, getVerification };

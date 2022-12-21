@@ -8,22 +8,9 @@ import { getCartDiscounts, createCartDiscount, createDiscountCode, applyDiscount
 import { getCart, getCarts } from './src/ct-cart.js';
 import { getBody } from './util/body.js';
 import { redis } from './util/redis.js';
+import makeId from './util/id.js';
 
 const token = await auth();
-
-const makeid = (length) => {
-    var result = '';
-    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    var charactersLength = characters.length;
-    for (var i = 0; i < length; i++) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return (result.substring(0, length / 2) + nano() + result.substring(length / 2, length)).toUpperCase();
-}
-
-const queryVerification = async (verificationId) => {
-    return await getVerification(verificationId);
-}
 
 const setRedisCart = async (cartId, verificationData) => {
     return await redis.set(`cart-${cartId}`, JSON.stringify(verificationData));
@@ -34,7 +21,7 @@ const updateCart = async (sessionId, cartId) => {
     if (existing) {
         return;
     }
-    const code = "ST" + makeid(6)
+    const code = makeId("ST", 6)
     console.log('updating cart', cartId, code);
     const cart = await getCart(token, cartId);
     const res = await createDiscountCode(token, "Student Discount", config.CART_DISCOUNT_ID, code);
@@ -86,7 +73,7 @@ http.createServer(async (req, res) => {
         if (body != undefined && body.length > 0) {
             const b = JSON.parse(body);
             console.log(`processing verification ${config.SHEERID_API_URL}`, body);
-            const r = await queryVerification(b.verificationId);
+            const r = await getVerification(b.verificationId);
             try {
                 if (r.personInfo?.metadata != undefined) {
                     console.log('metadata', r.personInfo.metadata);

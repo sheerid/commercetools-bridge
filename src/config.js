@@ -17,6 +17,7 @@ if (config == undefined) {
         CART_DISCOUNT_ID: process.env.CART_DISCOUNT_ID,
         REDIS_HOST: process.env.REDIS_HOST,
         REDIS_PORT: process.env.REDIS_PORT,
+        VERSION: process.env.VERSION,
     };
 }
 

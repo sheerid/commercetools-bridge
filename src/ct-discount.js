@@ -11,28 +11,6 @@ const getCartDiscount = async (token, code) => {
     return await res.json();
 }
 
-const getCart = async (token, cartId) => {
-    console.log("getting",cartId, token.access_token);
-    const res = await fetch(`${config.CTP_API_URL}/${config.CTP_PROJECT_KEY}/carts/${cartId}`, {
-        method: 'GET',
-        headers: {
-            Authorization: 'Bearer ' + token.access_token,
-        },
-    });
-    return await res.json();
-}
-
-const getCarts = async (token) => {
-    console.log("getting ", token.access_token);
-    const res = await fetch(`${config.CTP_API_URL}/${config.CTP_PROJECT_KEY}/carts`, {
-        method: 'GET',
-        headers: {
-            Authorization: 'Bearer ' + token.access_token,
-        },
-    });
-    return await res.json();
-}
-
 const getCartDiscounts = async (token) => {
     const res = await fetch(
         `${config.CTP_API_URL}/${config.CTP_PROJECT_KEY}/cart-discounts`, {
@@ -136,4 +114,4 @@ const applyDiscount = async (token, cartId, version, discountCode) => {
     return await res.json();
 }
 
-export { getCartDiscount, getCartDiscounts, createCartDiscount, createDiscountCode, applyDiscount, getCart, getCarts };
+export { getCartDiscount, getCartDiscounts, createCartDiscount, createDiscountCode, applyDiscount };

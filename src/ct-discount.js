@@ -89,7 +89,7 @@ const createDiscountCode = async (token, name, cartDiscountId, cartDiscountCode)
 }
 
 const applyDiscount = async (token, cartId, version, discountCode) => {
-    console.log('applying discount to',cartId, version, discountCode);
+    console.log('applying discount to', cartId, version, discountCode);
     const reqj = JSON.stringify({
         version: version,
         actions: [{"action": "addDiscountCode", "code": discountCode}],

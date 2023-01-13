@@ -1,3 +1,5 @@
+import { nano } from '../src/nano.js';
+
 const makeId = (prefix, length) => {
     var result = '';
     var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';

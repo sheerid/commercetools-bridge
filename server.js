@@ -3,7 +3,6 @@ import http from 'http';
 import { auth } from './src/auth.js';
 import url from 'url';
 import { createWebhook, getVerification } from './src/sheerid.js';
-import { nano } from './src/nano.js';
 import { getCartDiscounts, createCartDiscount, createDiscountCode, applyDiscount } from './src/ct-discount.js';
 import { getCart, getCarts } from './src/ct-cart.js';
 import { getBody } from './util/body.js';
@@ -24,6 +23,10 @@ const updateCart = async (sessionId, cartId) => {
     const code = makeId("ST", 6)
     console.log('updating cart', cartId, code);
     const cart = await getCart(token, cartId);
+    if (cart.discountCodes.length > 0) {
+        console.log('cart already has discount code');
+        return;
+    }
     const res = await createDiscountCode(token, "Student Discount", config.CART_DISCOUNT_ID, code);
     if (res) {
         console.log(res);
@@ -38,7 +41,11 @@ http.createServer(async (req, res) => {
         console.log('get /');
         res.writeHead(200, { 'Content-Type': 'text/plain' });
         res.end('SheerID - commercetools Demo server '+config.VERSION);
-    } else if (req.url === '/health') {
+    } else if (req.url === '/api/version' && req.method === 'GET') {
+            console.log('get /api/version', config.VERSION);
+            res.writeHead(200, { 'Content-Type': 'text/plain' });
+            res.end('SheerID - commercetools Demo server '+config.VERSION);
+        } else if (req.url === '/health') {
         res.end('OK');
     } else if (req.url === '/api/demodata') {
         const demoData = {
@@ -87,6 +94,31 @@ http.createServer(async (req, res) => {
                 console.log('error setting redis:', err);
             }
         }
+    } else if (req.url === '/api/cart-discounts' && req.method === 'GET') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        const discounts = await getCartDiscounts(token);
+        const o = {};
+        discounts.results.forEach(element => {
+            o[element.id] = element.name.en;
+        });
+        res.end(JSON.stringify(o));
+    } else if (req.url.startsWith('/api/carts') && req.method === 'GET') {
+        const q = url.parse(req.url, true).query;
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        const carts = await getCarts(token);
+        let cartVersions = {};
+        carts.results.forEach(element => {
+            cartVersions[element.id] = element.version;
+        });
+        res.end(JSON.stringify(cartVersions, undefined, ' '));
+    } else if (req.url.startsWith('/api/cart') && req.method === 'GET') {
+        // get cart version
+        // get last part of query string /api/cart/{123}
+        const q = req.url.replace('/api/cart/', '');
+        console.log('get /api/cart', q);
+        const cart = await getCart(token, q);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(cart, undefined, ' '));
     } else if (req.url === '/api/webhook' && req.method === 'POST') {
         return; // disabled, reference only
         const body = await getBody(req);
@@ -102,23 +134,6 @@ http.createServer(async (req, res) => {
         const q = url.parse(req.url, true).query;
         const r = await createWebhook(q.pid);
         res.end(JSON.stringify(r));
-    } else if (req.url === '/api/cart-discounts' && req.method === 'GET') {
-        return; // disabled, reference only
-        console.log('get /api/cart-discounts');
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        const discounts = await getCartDiscounts(token.access_token);
-        console.log('number of discounts:', discounts.total);
-        const o = {};
-        discounts.results.forEach(element => {
-            console.log(element);
-            o[element.id] = element.name.en;
-        });
-        res.end(JSON.stringify(o));
-    } else if (req.url.startsWith('/api/getcarts') && req.method === 'GET') {
-        return; // disabled, reference only
-        const q = url.parse(req.url, true).query;
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(await getCarts(token)));
     } else {
         console.log('404', req.url);
         res.statusCode = 404;

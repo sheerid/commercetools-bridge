@@ -24,6 +24,10 @@ const updateCart = async (sessionId, cartId) => {
         token = await auth();
         console.log('token refreshed', token.access_token);
     }
+    if (!token.access_token) {
+        console.log('no token, aborting');
+        return;
+    }
     const existing = await redis.get(`cartid-${sessionId}`);
     if (existing) {
         return;

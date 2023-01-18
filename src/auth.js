@@ -2,6 +2,7 @@ import fetch from 'node-fetch';
 import { config } from './config.js';
 
 const auth = async () => {
+    console.log('auth', config.CTP_AUTH_URL, config.CTP_CLIENT_ID, config.CTP_CLIENT_SECRET, config.CTP_SCOPES);
     const res = await fetch(`${config.CTP_AUTH_URL}/oauth/token`, {
         'method': 'post',
         'headers': {

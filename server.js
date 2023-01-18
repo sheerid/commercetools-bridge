@@ -29,9 +29,9 @@ const updateCart = async (sessionId, cartId) => {
     }
     const res = await createDiscountCode(token, "Student Discount", config.CART_DISCOUNT_ID, code);
     if (res) {
-        console.log(res);
+        console.log('create discount code result', res);
         const res2 = await applyDiscount(token, cartId, cart.version, code);
-        console.log(res2);
+        console.log('apply discount code result', res2);
         await redis.set(`cartid-${sessionId}`, cartId);
     }
 }
@@ -45,7 +45,7 @@ http.createServer(async (req, res) => {
             console.log('get /api/version', config.VERSION);
             res.writeHead(200, { 'Content-Type': 'text/plain' });
             res.end('SheerID - commercetools Demo server '+config.VERSION);
-        } else if (req.url === '/health') {
+    } else if (req.url === '/health') {
         res.end('OK');
     } else if (req.url === '/api/demodata') {
         const demoData = {
@@ -71,7 +71,7 @@ http.createServer(async (req, res) => {
         try {
             updateCart(q.cid, q.cart);
         } catch (e) {
-            console.log(e);
+            console.log('error updating cart', e);
         }
     } else if (req.url === '/api/success-webhook' && req.method === 'POST') {
         console.log(`post /api/success-webhook => ${config.SHEERID_API_URL}`);
@@ -98,7 +98,7 @@ http.createServer(async (req, res) => {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         const discounts = await getCartDiscounts(token);
         const o = {};
-        discounts.results.forEach(element => {
+        discounts.results?.forEach(element => {
             o[element.id] = element.name.en;
         });
         res.end(JSON.stringify(o));

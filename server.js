@@ -14,14 +14,22 @@ const buildDate = fs.readFileSync('./build-date.txt', 'utf8');
 
 let token = await auth();
 
+const refreshAuthToken = async () => {
+    token.access_token = '';
+    token = await auth();
+    if (token.access_token) {
+        setTimeout(refreshAuthToken, token.expires_in * 1000);
+    }
+}
+
 const setRedisCart = async (cartId, verificationData) => {
     return await redis.set(`cart-${cartId}`, JSON.stringify(verificationData));
 }
 
 const updateCart = async (sessionId, cartId) => {
-    if (!token.access_token || token.expires_at < Date.now()) {
+    if (!token.access_token) {
         console.log('token expired, refreshing', token);
-        token = await auth();
+        refreshAuthToken();
         console.log('token refreshed', token.access_token);
     }
     if (!token.access_token) {
@@ -58,7 +66,13 @@ http.createServer(async (req, res) => {
             res.writeHead(200, { 'Content-Type': 'text/plain' });
             res.end('SheerID - commercetools Demo server '+buildDate+' '+config.VERSION.toString());
     } else if (req.url === '/health') {
-        res.end('OK');
+        if (token.access_token) {
+            res.writeHead(200, { 'Content-Type': 'text/plain' });
+            res.end('OK');
+        } else {
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end('NO HEALTHY AUTH TOKEN');
+        }
     } else if (req.url === '/api/demodata') {
         const demoData = {
             "HARVARDCRIMPROXS": "Harvard Business School (Boston, MA)",

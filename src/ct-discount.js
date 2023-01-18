@@ -71,6 +71,7 @@ const createDiscountCode = async (token, name, cartDiscountId, cartDiscountCode)
         isActive: true,
         cartPredicate: '1=1'
     })
+    console.log('createDiscountCode call', config.CTP_API_URL, config.CTP_PROJECT_KEY, token.access_token, sjson);
     const res = await fetch(
         `${config.CTP_API_URL}/${config.CTP_PROJECT_KEY}/discount-codes`,
         {

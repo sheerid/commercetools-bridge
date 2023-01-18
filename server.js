@@ -23,7 +23,7 @@ const updateCart = async (sessionId, cartId) => {
     const code = makeId("ST", 6)
     console.log('updating cart', cartId, code);
     const cart = await getCart(token, cartId);
-    if (cart.discountCodes.length > 0) {
+    if (cart?.discountCodes?.length > 0) {
         console.log('cart already has discount code');
         return;
     }

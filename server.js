@@ -44,7 +44,7 @@ http.createServer(async (req, res) => {
     } else if (req.url === '/api/version' && req.method === 'GET') {
             console.log('get /api/version', config.VERSION);
             res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end('SheerID - commercetools Demo server '+config.VERSION);
+            res.end('SheerID - commercetools Demo server '+config.VERSION.toString());
     } else if (req.url === '/health') {
         res.end('OK');
     } else if (req.url === '/api/demodata') {

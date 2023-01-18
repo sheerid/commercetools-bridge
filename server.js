@@ -12,19 +12,24 @@ import fs from 'fs';
 
 const buildDate = fs.readFileSync('./build-date.txt', 'utf8');
 
-const token = await auth();
+let token = await auth();
 
 const setRedisCart = async (cartId, verificationData) => {
     return await redis.set(`cart-${cartId}`, JSON.stringify(verificationData));
 }
 
 const updateCart = async (sessionId, cartId) => {
+    if (!token.access_token || token.expires_at < Date.now()) {
+        console.log('token expired, refreshing', token);
+        token = await auth();
+        console.log('token refreshed', token.access_token);
+    }
     const existing = await redis.get(`cartid-${sessionId}`);
     if (existing) {
         return;
     }
     const code = makeId("ST", 6)
-    console.log('updating cart', cartId, code);
+    console.log('updating cart', cartId, code, token);
     const cart = await getCart(token, cartId);
     if (cart?.discountCodes?.length > 0) {
         console.log('cart already has discount code');

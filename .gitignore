@@ -3,3 +3,4 @@ node_modules
 *.csv
 
 yarn.lock
+build-date.txt

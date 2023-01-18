@@ -8,6 +8,9 @@ import { getCart, getCarts } from './src/ct-cart.js';
 import { getBody } from './util/body.js';
 import { redis } from './util/redis.js';
 import makeId from './util/id.js';
+import fs from 'fs';
+
+const buildDate = fs.readFileSync('./build-date.txt', 'utf8');
 
 const token = await auth();
 
@@ -44,7 +47,7 @@ http.createServer(async (req, res) => {
     } else if (req.url === '/api/version' && req.method === 'GET') {
             console.log('get /api/version', config.VERSION);
             res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end('SheerID - commercetools Demo server '+config.VERSION.toString());
+            res.end('SheerID - commercetools Demo server '+buildDate+' '+config.VERSION.toString());
     } else if (req.url === '/health') {
         res.end('OK');
     } else if (req.url === '/api/demodata') {

@@ -62,7 +62,7 @@ http.createServer(async (req, res) => {
         res.writeHead(200, { 'Content-Type': 'text/plain' });
         res.end('SheerID - commercetools Demo server '+config.VERSION);
     } else if (req.url === '/api/version' && req.method === 'GET') {
-            console.log('get /api/version', config.VERSION);
+            console.log('get /api/version', buildDate, config.VERSION);
             res.writeHead(200, { 'Content-Type': 'text/plain' });
             res.end('SheerID - commercetools Demo server '+buildDate+' '+config.VERSION.toString());
     } else if (req.url === '/health') {
@@ -166,4 +166,4 @@ http.createServer(async (req, res) => {
         res.end('404: File Not Found');
     }
 }).listen(config.PORT);
-console.log(`server is running on http://localhost:${config.PORT}/`, config.VERSION);
+console.log(`server is running on http://localhost:${config.PORT}/`, buildDate, config.VERSION);

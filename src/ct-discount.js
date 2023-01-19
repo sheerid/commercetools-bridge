@@ -12,7 +12,6 @@ const getCartDiscount = async (token, code) => {
 }
 
 const getCartDiscounts = async (token) => {
-    console.log('getCartDiscounts', config.CTP_API_URL, config.CTP_PROJECT_KEY, token.access_token);
     const res = await fetch(
         `${config.CTP_API_URL}/${config.CTP_PROJECT_KEY}/cart-discounts`, {
         method: 'GET',

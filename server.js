@@ -4,6 +4,7 @@ import { auth } from './src/auth.js';
 import url from 'url';
 import { createWebhook, getVerification } from './src/sheerid.js';
 import { getCartDiscounts, createCartDiscount, createDiscountCode, applyDiscount } from './src/ct-discount.js';
+import { setCustomerField } from './src/ct-tagging.js';
 import { getCart, getCarts } from './src/ct-cart.js';
 import { getBody } from './util/body.js';
 import { redis } from './util/redis.js';
@@ -112,6 +113,11 @@ http.createServer(async (req, res) => {
                     console.log('metadata', r.personInfo.metadata);
                     const cartId = r.personInfo.metadata.cid;
                     console.log(`saving ${cartId} cart id`);
+                    if (r.personInfo.metadata.customerId && r.personInfo?.metadata.customerId !== 'null') {
+                        // set custom field in commercetools API for customer
+                        const res = await setCustomerField(r.personInfo.metadata.customerId, r);
+                        console.log('set customer field result', res);
+                    }
                     setRedisCart(cartId, r);
                 } else {
                     console.log('no metadata', r);

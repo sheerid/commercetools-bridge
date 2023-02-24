@@ -20,7 +20,6 @@ const createWebhook = async (programId) => {
 
 const getVerificationPromise = async (verificationId, details) => {
     const url = `${config.SHEERID_API_URL}verification/${verificationId}`;
-    console.log('getVerificationPromise', url);
     const res = await fetch(
         url+(details?"/details":""), {
         'method': 'GET',

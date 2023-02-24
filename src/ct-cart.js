@@ -2,7 +2,6 @@ import fetch from 'node-fetch';
 import { config } from './config.js';
 
 const getCart = async (token, cartId) => {
-    console.log("getting",cartId, token.access_token);
     const res = await fetch(`${config.CTP_API_URL}/${config.CTP_PROJECT_KEY}/carts/${cartId}`, {
         method: 'GET',
         headers: {

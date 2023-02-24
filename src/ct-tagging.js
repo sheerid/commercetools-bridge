@@ -36,7 +36,7 @@ const setCustomType = async (token, customerId, version, typeId) => {
 const setCustomField = async (token, customerId, verificationId, verification, typeId) => {
 
     const customer = await getCustomer(token, customerId);
-    console.log('customer', customer);
+
     if (customer.version === undefined) {
         console.log('customer not found by id', customerId);
         return;
@@ -46,8 +46,6 @@ const setCustomField = async (token, customerId, verificationId, verification, t
         await setCustomType(token, customerId, customer.version, typeId);
         customer.version++;
     }
-
-    console.log('setCustomField', customerId, verificationId, verification?.confirmedSegments[0].segment, verification?.personInfo.organization.name);
 
     const res = await fetch(`${config.CTP_API_URL}/${config.CTP_PROJECT_KEY}/customers/${customerId}`, {
         method: 'POST',

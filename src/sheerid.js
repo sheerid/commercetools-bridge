@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import { config } from './config.js';
+import crypto from 'crypto';
 
 const createWebhook = async (programId) => {
     const res = await fetch(
@@ -17,9 +18,11 @@ const createWebhook = async (programId) => {
     return res.json();
 }
 
-const getVerificationPromise = async (verificationId) => {
+const getVerificationPromise = async (verificationId, details) => {
+    const url = `${config.SHEERID_API_URL}verification/${verificationId}`;
+    console.log('getVerificationPromise', url);
     const res = await fetch(
-        `${config.SHEERID_API_URL}/verification/${verificationId}/details`, {
+        url+(details?"/details":""), {
         'method': 'GET',
         'headers': {
             'Authorization': `Bearer ${config.SHEERID_TOKEN}`,
@@ -30,10 +33,17 @@ const getVerificationPromise = async (verificationId) => {
     return res.json();
 }
 
-const getVerification = async (verificationId) => {
-    return await getVerificationPromise(verificationId);
+const verifySignature = (headers, body, secret) => {
+    const signature = headers['x-sheerid-signature'];
+    const hmac = crypto.createHmac('sha256', secret);
+
+    return hmac.update(body).digest('hex') === signature;
 }
 
-export { createWebhook, getVerification };
+const getVerification = async (verificationId, details) => {
+    return await getVerificationPromise(verificationId, details);
+}
+
+export { createWebhook, getVerification, verifySignature };
 
 

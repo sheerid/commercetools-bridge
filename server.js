@@ -2,10 +2,11 @@ import { config } from './src/config.js';
 import http from 'http';
 import { auth } from './src/auth.js';
 import url from 'url';
-import { createWebhook, getVerification } from './src/sheerid.js';
+import { createWebhook, getVerification, verifySignature } from './src/sheerid.js';
 import { getCartDiscounts, createCartDiscount, createDiscountCode, applyDiscount } from './src/ct-discount.js';
-import { setCustomerField } from './src/ct-tagging.js';
+import { setCustomField } from './src/ct-tagging.js';
 import { getCart, getCarts } from './src/ct-cart.js';
+import { addCustomField } from './src/ct-customfield.js';
 import { getBody } from './util/body.js';
 import { redis } from './util/redis.js';
 import makeId from './util/id.js';
@@ -14,6 +15,9 @@ import fs from 'fs';
 const buildDate = fs.readFileSync('./build-date.txt', 'utf8');
 
 let token = await auth();
+
+const typeId = await addCustomField(token);
+console.log('typeId', typeId);
 
 const refreshAuthToken = async () => {
     token.access_token = '';
@@ -61,11 +65,11 @@ http.createServer(async (req, res) => {
     if (req.url === '/' && req.method === 'GET') {
         console.log('get /');
         res.writeHead(200, { 'Content-Type': 'text/plain' });
-        res.end('SheerID - commercetools Demo server '+config.VERSION);
+        res.end('SheerID - commercetools Demo server ' + config.VERSION);
     } else if (req.url === '/api/version' && req.method === 'GET') {
-            console.log('get /api/version', buildDate, config.VERSION);
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end('SheerID - commercetools Demo server '+buildDate+' '+config.VERSION.toString());
+        console.log('get /api/version', buildDate, config.VERSION);
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.end('SheerID - commercetools Demo server ' + buildDate + ' ' + config.VERSION.toString());
     } else if (req.url === '/health') {
         if (token.access_token) {
             res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -106,8 +110,12 @@ http.createServer(async (req, res) => {
         res.end('OK');
         if (body != undefined && body.length > 0) {
             const b = JSON.parse(body);
-            console.log(`processing verification ${config.SHEERID_API_URL}`, body);
-            const r = await getVerification(b.verificationId);
+            // if (!verifySignature(req.headers, body, config.SHEERID_WEBHOOK_SECRET)) {
+            //     console.log('invalid signature');
+            //     return;
+            // }
+            console.log(`processing verification ${config.SHEERID_API_URL}`, body, req.headers);
+            const r = await getVerification(b.verificationId, true);
             try {
                 if (r.personInfo?.metadata != undefined) {
                     console.log('metadata', r.personInfo.metadata);
@@ -115,7 +123,8 @@ http.createServer(async (req, res) => {
                     console.log(`saving ${cartId} cart id`);
                     if (r.personInfo.metadata.customerId && r.personInfo?.metadata.customerId !== 'null') {
                         // set custom field in commercetools API for customer
-                        const res = await setCustomerField(r.personInfo.metadata.customerId, r);
+                        console.log('setting customer field', r.personInfo.metadata.customerId)
+                        const res = await setCustomField(token, r.personInfo.metadata.customerId, b.verificationId, r, typeId);
                         console.log('set customer field result', res);
                     }
                     setRedisCart(cartId, r);

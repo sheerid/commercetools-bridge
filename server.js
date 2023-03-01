@@ -31,7 +31,7 @@ const setRedisCart = async (cartId, verificationData) => {
     return await redis.set(`cart-${cartId}`, JSON.stringify(verificationData));
 }
 
-const updateCart = async (sessionId, cartId) => {
+const updateCart = async (sessionId, cartId, discountName) => {
     if (!token.access_token) {
         console.log('token expired, refreshing', token);
         refreshAuthToken();
@@ -52,7 +52,7 @@ const updateCart = async (sessionId, cartId) => {
         console.log('cart already has discount code');
         return;
     }
-    const res = await createDiscountCode(token, "Student Discount", config.CART_DISCOUNT_ID, code);
+    const res = await createDiscountCode(token, discountName || "Discount", config.CART_DISCOUNT_ID, code);
     if (res) {
         console.log('create discount code result', res);
         const res2 = await applyDiscount(token, cartId, cart.version, code);
@@ -100,7 +100,7 @@ http.createServer(async (req, res) => {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(`{}`);
         try {
-            updateCart(q.cid, q.cart);
+            updateCart(q.cid, q.cart, q.discount);
         } catch (e) {
             console.log('error updating cart', e);
         }
